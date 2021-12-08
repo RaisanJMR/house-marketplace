@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { toast } from 'react-toastify'
 import { ReactComponent as ArrowRight } from '../assets/svg/keyboardArrowRightIcon.svg'
 import {
   getAuth,
@@ -28,7 +29,7 @@ function SignUp() {
   const onSubmit = async (e) => {
     e.preventDefault()
     try {
-      // FIREBASE SYNTAX TO SIGN-UP
+      //🌟🌟🌟 FIREBASE SYNTAX TO SIGN-UP ✌🌟🌟🌟🌟
       const auth = getAuth()
       const userCredential = await createUserWithEmailAndPassword(
         auth,
@@ -36,16 +37,21 @@ function SignUp() {
         password
       )
       const user = userCredential.user
+      console.log(user)
       updateProfile(auth.currentUser, {
         displayName: name,
       })
+      //✔ COPYING ARRAY
       const formDataCopy = { ...formData }
+      //✔ REMOVING PASSWORD
       delete formDataCopy.password
+       //✔ ADDING SERVER TIMESTAMP
       formDataCopy.timestamp = serverTimestamp()
+       //✔ ADDING USER TO ❝USERS❞ COLLECTION IN FIREBASE ⚡
       await setDoc(doc(db, 'users', user.uid), formDataCopy)
       navigate('/')
     } catch (error) {
-      console.log(error)
+      toast.error('Somenthing went wrong with registration')
     }
   }
   return (
