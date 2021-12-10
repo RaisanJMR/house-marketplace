@@ -1,9 +1,10 @@
 import { getAuth, updateProfile } from 'firebase/auth'
 import { updateDoc, doc } from 'firebase/firestore'
-import { useState, useEffect } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { db } from '../firebase.config'
 import { toast } from 'react-toastify'
+
 function Profile() {
   const auth = getAuth()
   const [changeDetails, setChangeDetails] = useState(false)
@@ -57,8 +58,7 @@ function Profile() {
             onClick={() => {
               changeDetails && onSubmit()
               setChangeDetails((prevState) => !prevState)
-            }}
-          >
+            }}>
             {changeDetails ? 'Done' : 'Change details'}
           </p>
         </div>
