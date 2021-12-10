@@ -10,6 +10,7 @@ import {
 import { setDoc, doc, serverTimestamp } from 'firebase/firestore'
 import { db } from '../firebase.config'
 import visibilityIcon from '../assets/svg/visibilityIcon.svg'
+import OAuth from '../components/OAuth'
 
 function SignUp() {
   const [showPassword, setShowPassword] = useState(false)
@@ -45,9 +46,9 @@ function SignUp() {
       const formDataCopy = { ...formData }
       //✔ REMOVING PASSWORD
       delete formDataCopy.password
-       //✔ ADDING SERVER TIMESTAMP
+      //✔ ADDING SERVER TIMESTAMP
       formDataCopy.timestamp = serverTimestamp()
-       //✔ ADDING USER TO ❝USERS❞ COLLECTION IN FIREBASE ⚡
+      //✔ ADDING USER TO ❝USERS❞ COLLECTION IN FIREBASE ⚡
       await setDoc(doc(db, 'users', user.uid), formDataCopy)
       navigate('/')
     } catch (error) {
@@ -106,7 +107,7 @@ function SignUp() {
               </button>
             </div>
           </form>
-          {/* google auth */}
+          <OAuth />
           <Link to='/sign-in' className='registerLink'>
             Sign In Instead?
           </Link>
