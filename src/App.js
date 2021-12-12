@@ -11,6 +11,7 @@ import 'react-toastify/dist/ReactToastify.css'
 import ForgotPassword from './pages/ForgotPassword'
 import Navbar from './components/Navbar'
 import { PrivateRoute } from './components/PrivateRoute'
+import CreateListings from './pages/CreateListings'
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
           <Route path='/sign-in' element={<SignIn />} />
           <Route path='/sign-up' element={<SignUp />} />
           <Route path='/forgot-password' element={<ForgotPassword />} />
+          <Route path='/create-listing' element={<CreateListings />} />
         </Routes>
         <Navbar />
       </Router>
