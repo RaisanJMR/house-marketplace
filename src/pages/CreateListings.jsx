@@ -2,7 +2,15 @@ import { useState, useEffect, useRef } from 'react'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
 import { useNavigate } from 'react-router-dom'
 import Spinner from '../components/Spinner'
-
+import { toast } from 'react-toastify'
+import {
+  getStorage,
+  ref,
+  uploadBytesResumable,
+  getDownloadURL,
+} from 'firebase/storage'
+import { db } from '../firebase.config'
+import { v4 as uuid } from 'uuid'
 const CreateListings = () => {
   const [geoLocationEnabled, setGeoLocationEnabled] = useState(true)
   const [loading, setLoading] = useState(false)
@@ -82,7 +90,91 @@ const CreateListings = () => {
   }
   const onSubmit = async (e) => {
     e.preventDefault()
-    console.log(formData)
+
+    setLoading(true)
+
+    if (discountedPrice >= regularPrice) {
+      setLoading(false)
+      toast.error('Discounted price needs to be less than regular price')
+      return
+    }
+
+    if (images.length > 6) {
+      setLoading(false)
+      toast.error('Max 6 images')
+      return
+    }
+    let geolocation = {}
+    let location
+
+    if (geoLocationEnabled) {
+      const response = await fetch(
+        `https://maps.googleapis.com/maps/api/geocode/json?address=${address}&key=${process.env.REACT_APP_GEOCODE_API_KEY}`
+      )
+      const data = await response.json()
+      console.log(data)
+      geolocation.lat = data.results[0]?.geometry.location.lat ?? 0
+      geolocation.lng = data.results[0]?.geometry.location.lng ?? 0
+      location =
+        data.status === 'ZERO_RESULTS'
+          ? undefined
+          : data.results[0]?.formatted_addrsess
+      if (location === undefined || location.includes('undefined')) {
+        setLoading(false)
+        toast.error('Please enter a correct address')
+      }
+    } else {
+      geolocation.lat = latitude
+      geolocation.lng = longitude
+      location = address
+      console.log(geolocation, location)
+    }
+    // store images in firebase
+    const storeImage = async (image) => {
+      return new Promise((resolve, reject) => {
+        const storage = getStorage()
+        const filename = `{auth.currentUser.uid}-${image.name}-{uuidv4()}`
+        const storageRef = ref(storage, 'images/' + filename)
+        const uploadTask = uploadBytesResumable(storageRef, image)
+
+        // Listen for state changes, errors, and completion of the upload.
+        uploadTask.on(
+          'state_changed',
+          (snapshot) => {
+            // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+            const progress =
+              (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+            console.log('Upload is ' + progress + '% done')
+            switch (snapshot.state) {
+              case 'paused':
+                console.log('Upload is paused')
+                break
+              case 'running':
+                console.log('Upload is running')
+                break
+            }
+          },
+          (error) => {
+            reject(error)
+          },
+          () => {
+            // Upload completed successfully, now we can get the download URL
+            getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+              resolve(downloadURL)
+            })
+          }
+        )
+      })
+    }
+    const imgUrls = await Promise.all(
+      [...images].map((image) => storeImage(image))
+    ).catch(() => {
+      setLoading(false)
+      toast.error('images not uploaded')
+      return
+    })
+    console.log(imgUrls)
+    setLoading(false)
   }
   return (
     <div className='profile'>
