@@ -9,10 +9,11 @@ import {
   uploadBytesResumable,
   getDownloadURL,
 } from 'firebase/storage'
+import { addDoc, collection, serverTimestamp } from 'firebase/firestore'
 import { db } from '../firebase.config'
 import { v4 as uuid } from 'uuid'
 const CreateListings = () => {
-  const [geoLocationEnabled, setGeoLocationEnabled] = useState(true)
+  const [geoLocationEnabled, setGeoLocationEnabled] = useState(false)
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
     type: 'rent',
@@ -126,7 +127,7 @@ const CreateListings = () => {
     } else {
       geolocation.lat = latitude
       geolocation.lng = longitude
-      location = address
+      // location = address
       console.log(geolocation, location)
     }
     // store images in firebase
@@ -173,8 +174,22 @@ const CreateListings = () => {
       toast.error('images not uploaded')
       return
     })
-    console.log(imgUrls)
+    // console.log(imgUrls)
+    const formDataCopy = {
+      ...formData,
+      imgUrls,
+      geolocation,
+      timestamp: serverTimestamp(),
+    }
+    formDataCopy.location = address
+    delete formDataCopy.images
+    delete formDataCopy.address
+    // location && (formDataCopy.location = location)
+    !formDataCopy.offer && delete formDataCopy.discountedPrice
+    const docRef = await addDoc(collection(db, 'listings'), formDataCopy)
     setLoading(false)
+    toast.success('Listings saved')
+    navigate(`/category/${formDataCopy.type}/${docRef.id}`)
   }
   return (
     <div className='profile'>

@@ -5,13 +5,14 @@ import bedIcon from '../assets/svg/bedIcon.svg'
 import bathTubIcon from '../assets/svg/bathtubIcon.svg'
 const ListingItem = ({ listing, id, onDelete }) => {
   console.log(listing)
+  console.log(listing.imgUrls[0])
   return (
     <li className='categoryListing'>
       <Link
         to={`/category/${listing.type}/${id}`}
         className='categoryListingLink'>
         <img
-          src={listing.imageUrls[0]}
+          src={listing.imgUrls[0]}
           alt={listing.name}
           className='categoryListingImg'
         />
