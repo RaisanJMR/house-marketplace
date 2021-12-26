@@ -4,8 +4,8 @@ import { ReactComponent as DeleteIcon } from '../assets/svg/deleteIcon.svg'
 import bedIcon from '../assets/svg/bedIcon.svg'
 import bathTubIcon from '../assets/svg/bathtubIcon.svg'
 const ListingItem = ({ listing, id, onDelete }) => {
-  console.log(listing)
-  console.log(listing.imgUrls[0])
+  // console.log(listing)
+  // console.log(listing.imgUrls[0])
   return (
     <li className='categoryListing'>
       <Link

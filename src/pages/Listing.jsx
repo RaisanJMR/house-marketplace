@@ -6,30 +6,92 @@ import { db } from '../firebase.config'
 import Spinner from '../components/Spinner'
 import shareIcon from '../assets/svg/shareIcon.svg'
 function Listing() {
-  const [listing, setListing] = useState(null)
+  const [listing, setListing] = useState('')
+  console.log('LISTING😄😄>>>', listing.userRef)
   const [loading, setLoading] = useState(true)
-  const [shareLinkCopied, setShareLinkCopied] = useState(false)
-  const params = useParams()
+  const [sharedLinkCopied, setSharedLinkCopied] = useState(false)
+  // console.log(sharedLinkCopied)
   const navigate = useNavigate()
+  const params = useParams()
   const auth = getAuth()
+// console.log(auth.currentUser)
+  // console.log(params)
   useEffect(() => {
     const fetchListing = async () => {
       const docRef = doc(db, 'listings', params.listingId)
       const docSnap = await getDoc(docRef)
       if (docSnap.exists()) {
         setListing(docSnap.data())
-        console.log(docSnap.data())
         setLoading(false)
       }
     }
     fetchListing()
   }, [navigate, params.listingId])
-  console.log(params)
+  if (loading) {
+    ;<Spinner />
+  }
   return (
-    <div>
-      <h1>Listing</h1>
-    </div>
+    <main>
+      {/* Slider */}
+      <div
+        className='shareIconDiv'
+        onClick={() => {
+          navigator.clipboard.writeText(window.location.href)
+          setSharedLinkCopied(true)
+          setTimeout(() => {
+            setSharedLinkCopied(false)
+          }, 2000)
+        }}>
+        <img src={shareIcon} alt='' />
+      </div>
+      {sharedLinkCopied && <p className='linkCopied'>Link Copied</p>}
+      <div className='listingDetails'>
+        <p className='listingName'>
+          {listing.name} - $
+          {
+            listing.offer
+              ? listing.discountedPrice
+              : // .toString()
+                // .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+                listing.regularPrice
+            // .toString()
+            // .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+          }
+        </p>
+        <p className='listingLocation'>{listing.location}</p>
+        <p className='listingType'>
+          For {listing.type === 'rent' ? 'Rent' : 'Sale'}
+        </p>
+        {listing.offer && (
+          <p className='discountPrice'>
+            $ {listing.regularPrice - listing.discountedPrice} discount
+          </p>
+        )}
+        <ul className='listingDetailsList'>
+          <li>
+            {listing.bedrooms > 1
+              ? `${listing.bedrooms} Bedrooms`
+              : '1 Bedroom'}
+          </li>
+          <li>
+            {listing.bathrooms > 1
+              ? `${listing.bathrooms} Bathrooms`
+              : '1 Bathroom'}
+          </li>
+          <li>{listing.parking && 'Parking Spot'}</li>
+          <li>{listing.furnished && 'Furnished'}</li>
+        </ul>
+        <p className='listingLocationTitle'>Location</p>
+        {/* map */}
+        {auth.currentUser?.uid !== listing.userRef && (
+          <Link
+            to={`/contact/${listing.userRef}?listingName=${listing.name}&listingLocation=${listing.location}`}
+            className='primaryButton'>
+            Contact Landlord
+          </Link>
+        )}
+      </div>
+    </main>
   )
 }
-
 export default Listing
