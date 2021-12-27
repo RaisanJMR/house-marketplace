@@ -1,4 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap');
+
+
+
 * {
   box-sizing: border-box;
 }
@@ -59,7 +62,7 @@ button {
 
 .primaryButton {
   cursor: pointer;
-  background: #00cc66;
+  background: #FF5A5F;
   border-radius: 1rem;
   padding: 0.85rem 2rem;
   color: #ffffff;
@@ -121,7 +124,7 @@ button {
   width: 64px;
   height: 64px;
   border: 8px solid;
-  border-color: #00cc66 transparent #00cc66 transparent;
+  border-color: #FF5A5F transparent #FF5A5F transparent;
   border-radius: 50%;
   animation: spin 1.2s linear infinite;
 }
@@ -182,7 +185,7 @@ button {
   color: #8f8f8f;
 }
 .navbarListItemNameActive {
-  color: #2c2c2c;
+  color: #FC642D;
 }
 
 .nameInput {
@@ -214,7 +217,7 @@ button {
 
 .forgotPasswordLink {
   cursor: pointer;
-  color: #00cc66;
+  color: #FF5A5F;
   font-weight: 600;
   text-align: right;
 }
@@ -254,7 +257,7 @@ button {
   align-items: center;
   width: 3rem;
   height: 3rem;
-  background-color: #00cc66;
+  background-color: #FF5A5F;
   border-radius: 50%;
 }
 @media (min-width: 1024px) {
@@ -291,7 +294,7 @@ button {
 
 .registerLink {
   margin-top: 1rem;
-  color: #00cc66;
+  color: #FF5A5F;
   font-weight: 600;
   text-align: center;
   margin-bottom: 3rem;
@@ -452,7 +455,7 @@ button {
   margin-top: 0.5rem;
   font-weight: 600;
   font-size: 1.1rem;
-  color: #00cc66;
+  color: #FF5A5F;
   margin-bottom: 0;
   display: flex;
   align-items: center;
@@ -525,7 +528,7 @@ button {
 
 .listingType {
   padding: 0.25rem 0.5rem;
-  background-color: #00cc66;
+  background-color: #FF5A5F;
   color: #ffffff;
   border-radius: 2rem;
   display: inline;
@@ -626,7 +629,7 @@ button {
   font-size: 1rem;
   font-weight: 600;
   color: #ffffff;
-  background-color: #00cc66;
+  background-color: #FF5A5F;
   padding: 0.25rem 0.75rem;
   border-radius: 1rem;
 }
@@ -644,7 +647,7 @@ button {
 .changePersonalDetails {
   cursor: pointer;
   font-weight: 600;
-  color: #00cc66;
+  color: #FF5A5F;
 }
 
 .profileCard {
@@ -739,7 +742,7 @@ button {
   align-items: center;
 }
 .formButtonActive {
-  background-color: #00cc66;
+  background-color: #FF5A5F;
   color: #ffffff;
 }
 
@@ -794,7 +797,7 @@ button {
   width: 100%;
 }
 .formInputFile::-webkit-file-upload-button {
-  background-color: #00cc66;
+  background-color: #FF5A5F;
   border: none;
   color: #ffffff;
   font-weight: 600;
