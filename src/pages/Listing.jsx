@@ -1,62 +1,85 @@
 import { useState, useEffect } from 'react'
-import { useParams, Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
+import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet'
+import SwiperCore, { Navigation, Pagination, Scrollbar, A11y } from 'swiper'
+import { Swiper, SwiperSlide } from 'swiper/react'
+import 'swiper/swiper-bundle.css'
 import { getDoc, doc } from 'firebase/firestore'
 import { getAuth } from 'firebase/auth'
 import { db } from '../firebase.config'
 import Spinner from '../components/Spinner'
 import shareIcon from '../assets/svg/shareIcon.svg'
+SwiperCore.use([Navigation, Pagination, Scrollbar, A11y])
+
 function Listing() {
-  const [listing, setListing] = useState('')
-  console.log('LISTING😄😄>>>', listing.userRef)
+  const [listing, setListing] = useState(null)
   const [loading, setLoading] = useState(true)
-  const [sharedLinkCopied, setSharedLinkCopied] = useState(false)
-  // console.log(sharedLinkCopied)
+  const [shareLinkCopied, setShareLinkCopied] = useState(false)
+
   const navigate = useNavigate()
   const params = useParams()
   const auth = getAuth()
-// console.log(auth.currentUser)
-  // console.log(params)
+
   useEffect(() => {
     const fetchListing = async () => {
       const docRef = doc(db, 'listings', params.listingId)
       const docSnap = await getDoc(docRef)
+
       if (docSnap.exists()) {
         setListing(docSnap.data())
         setLoading(false)
       }
     }
+
     fetchListing()
   }, [navigate, params.listingId])
+
   if (loading) {
-    ;<Spinner />
+    return <Spinner />
   }
+
   return (
     <main>
-      {/* Slider */}
+      
+      <Swiper slidesPerView={1} pagination={{ clickable: true }}>
+        {listing.imgUrls.map((url, index) => (
+          <SwiperSlide key={index}>
+            <div
+              style={{
+                background: `url("${listing.imgUrls[index]}") center no-repeat`,
+                backgroundSize: 'cover',
+              }}
+              className='swiperSlideDiv'
+            ></div>
+          </SwiperSlide>
+        ))}
+      </Swiper>
+
       <div
         className='shareIconDiv'
         onClick={() => {
           navigator.clipboard.writeText(window.location.href)
-          setSharedLinkCopied(true)
+          setShareLinkCopied(true)
           setTimeout(() => {
-            setSharedLinkCopied(false)
+            setShareLinkCopied(false)
           }, 2000)
-        }}>
+        }}
+      >
         <img src={shareIcon} alt='' />
       </div>
-      {sharedLinkCopied && <p className='linkCopied'>Link Copied</p>}
+
+      {shareLinkCopied && <p className='linkCopied'>Link Copied!</p>}
+
       <div className='listingDetails'>
         <p className='listingName'>
           {listing.name} - $
-          {
-            listing.offer
-              ? listing.discountedPrice
-              : // .toString()
-                // .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-                listing.regularPrice
-            // .toString()
-            // .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-          }
+          {listing.offer
+            ? listing.discountedPrice
+                .toString()
+                .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+            : listing.regularPrice
+                .toString()
+                .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
         </p>
         <p className='listingLocation'>{listing.location}</p>
         <p className='listingType'>
@@ -64,9 +87,10 @@ function Listing() {
         </p>
         {listing.offer && (
           <p className='discountPrice'>
-            $ {listing.regularPrice - listing.discountedPrice} discount
+            ${listing.regularPrice - listing.discountedPrice} discount
           </p>
         )}
+
         <ul className='listingDetailsList'>
           <li>
             {listing.bedrooms > 1
@@ -81,12 +105,34 @@ function Listing() {
           <li>{listing.parking && 'Parking Spot'}</li>
           <li>{listing.furnished && 'Furnished'}</li>
         </ul>
+
         <p className='listingLocationTitle'>Location</p>
-        {/* map */}
+
+        <div className='leafletContainer'>
+          <MapContainer
+            style={{ height: '100%', width: '100%' }}
+            center={[listing.geolocation.lat, listing.geolocation.lng]}
+            zoom={13}
+            scrollWheelZoom={false}
+          >
+            <TileLayer
+              attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+              url='https://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png'
+            />
+
+            <Marker
+              position={[listing.geolocation.lat, listing.geolocation.lng]}
+            >
+              <Popup>{listing.location}</Popup>
+            </Marker>
+          </MapContainer>
+        </div>
+
         {auth.currentUser?.uid !== listing.userRef && (
           <Link
-            to={`/contact/${listing.userRef}?listingName=${listing.name}&listingLocation=${listing.location}`}
-            className='primaryButton'>
+            to={`/contact/${listing.userRef}?listingName=${listing.name}`}
+            className='primaryButton'
+          >
             Contact Landlord
           </Link>
         )}
@@ -94,4 +140,5 @@ function Listing() {
     </main>
   )
 }
+
 export default Listing

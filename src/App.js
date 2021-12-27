@@ -13,6 +13,7 @@ import Navbar from './components/Navbar'
 import { PrivateRoute } from './components/PrivateRoute'
 import CreateListings from './pages/CreateListings'
 import Listing from './pages/Listing'
+import Contact from './pages/Contact'
 
 function App() {
   return (
@@ -33,6 +34,7 @@ function App() {
             path='/category/:categoryName/:listingId'
             element={<Listing />}
           />
+          <Route path='/contact/:landlordId' element={<Contact />} />
         </Routes>
         <Navbar />
       </Router>
