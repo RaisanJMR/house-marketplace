@@ -8,6 +8,7 @@ function Contact() {
   const [message, setMessage] = useState('')
   const [landLoard, setLandLoard] = useState('')
   console.log(landLoard)
+  // eslint-disable-next-line
   const [searchParams, setSearchParams] = useSearchParams()
   const params = useParams()
   console.log(params)

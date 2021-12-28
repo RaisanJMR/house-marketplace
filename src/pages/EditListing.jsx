@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import Spinner from '../components/Spinner'
 import { toast } from 'react-toastify'
 import {
@@ -9,13 +9,14 @@ import {
   uploadBytesResumable,
   getDownloadURL,
 } from 'firebase/storage'
-import { addDoc, collection, serverTimestamp } from 'firebase/firestore'
+import { doc, updateDoc, getDoc, serverTimestamp } from 'firebase/firestore'
 import { db } from '../firebase.config'
 
-const CreateListings = () => {
-    // eslint-disable-next-line
+const EditListing = () => {
+  // eslint-disable-next-line
   const [geoLocationEnabled, setGeoLocationEnabled] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [listing, setListing] = useState(false)
   const [formData, setFormData] = useState({
     type: 'rent',
     name: '',
@@ -48,7 +49,34 @@ const CreateListings = () => {
   } = formData
   const auth = getAuth()
   const navigate = useNavigate()
+  const params = useParams()
   const isMounted = useRef(true)
+  // Redirect if listing is not user's
+  useEffect(() => {
+    if (listing && listing.userRef !== auth.currentUser.uid) {
+      toast.error('You can not edit that listing')
+      navigate('/')
+    }
+  })
+  // Fetch listing to edit
+  useEffect(() => {
+    setLoading(true)
+    const fetchListing = async () => {
+      const docRef = doc(db, 'listings', params.listingId)
+      const docSnap = await getDoc(docRef)
+      if (docSnap.exists()) {
+        setListing(docSnap.data())
+        setFormData({ ...docSnap.data(), address: docSnap.data().location })
+        setLoading(false)
+      } else {
+        navigate('/')
+        toast.error('Listing does not exist')
+      }
+    }
+
+    fetchListing()
+  }, [params.listingId, navigate])
+  // sets user ref to logged in user
   useEffect(() => {
     if (isMounted) {
       onAuthStateChanged(auth, (user) => {
@@ -189,7 +217,9 @@ const CreateListings = () => {
     delete formDataCopy.address
     // location && (formDataCopy.location = location)
     !formDataCopy.offer && delete formDataCopy.discountedPrice
-    const docRef = await addDoc(collection(db, 'listings'), formDataCopy)
+    // Update listing
+    const docRef = doc(db, 'listings', params.listingId)
+    await updateDoc(docRef, formDataCopy)
     setLoading(false)
     toast.success('Listings saved')
     navigate(`/category/${formDataCopy.type}/${docRef.id}`)
@@ -197,7 +227,7 @@ const CreateListings = () => {
   return (
     <div className='profile'>
       <header>
-        <p className='pageHeader'>Create a Listing</p>
+        <p className='pageHeader'>Edit Listing</p>
       </header>
 
       <main>
@@ -424,4 +454,4 @@ const CreateListings = () => {
   )
 }
 
-export default CreateListings
+export default EditListing
